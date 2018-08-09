@@ -85,9 +85,9 @@ public class Gragh {
         return -1;
     }
 
-    //查询某个顶点的图的深度优先遍历  相当于树的前序遍历  depthFirstSearch
+    //深度优先遍历  相当于树的前序遍历  depthFirstSearch
     public void dfs(int index) {
-        isVisited[index] = true;
+        isVisited[index] = true;//将访问后的节点记录下来
         Log.e("TAG", "访问节点===" + index);
         int firstNeighbor = getFirstNeighbor(index);
         //这个负责不停的寻找当前顶点的第一个连接的顶点，实现深度遍历的效果
@@ -97,6 +97,7 @@ public class Gragh {
             }
         }
         //如果上面找到的节点没有找到下一个连接点，或是已经被遍历过了，那么就查询当前节点旁边的节点
+        //如果已经被访问了，那么继续找其他的旁边相连接的节点，如果没有访问过，那么就查找这个节点的第一个连接点
         int nextNeighbor = getNextNeighbor(index, firstNeighbor);
         while (nextNeighbor != -1) {
             if (!isVisited[nextNeighbor]) {
@@ -114,17 +115,17 @@ public class Gragh {
         if (!isVisited[index]) {
             isVisited[index] = true;
             Log.e("TAG", "访问节点===" + index);
-            queue.offer(index);
+            queue.offer(index);//将数据存放在队列中
         }
         //获取到第一个节点
         int firstNeighbor = getFirstNeighbor(index);
         if (firstNeighbor != -1) {
-            Integer poll = queue.poll();
             if (!isVisited[firstNeighbor]) {
                 Log.e("TAG", "访问节点===" + firstNeighbor);
                 isVisited[firstNeighbor] = true;
                 queue.offer(firstNeighbor);
             }
+            Integer poll = queue.poll();//将根节点退出栈，然后查询和它相连的其他连接点
             int nextNeighbor = getNextNeighbor(poll, firstNeighbor);
             while (nextNeighbor != -1) {
                 if (!isVisited[nextNeighbor]) {
@@ -135,7 +136,7 @@ public class Gragh {
                 nextNeighbor = getNextNeighbor(poll, nextNeighbor);
             }
             while (queue.size() > 0) {
-                bfs(queue.peek());
+                bfs(queue.peek());//使用queue.peek()查看queue中最前面的数据
             }
         }
     }
@@ -155,8 +156,9 @@ public class Gragh {
         int minWeight = MAX_WEIGHT;
         int curIndex = -1;
         int curIndex2 = -1;
-        //然后找到当前节点中的其他的节点
+        //遍历集合中的节点，找到当前节点中的其他的节点，
         for (int i = 0; i < vertexsList.size() && vertexsList.size() < vertexSize; i++) {
+            //然后遍历这个节点对应的数组，找寻其中的最小的权值
             for (int j = 0; j < vertexSize; j++) {
                 int weight = matrix[vertexsList.get(i)][j];
 
@@ -164,7 +166,7 @@ public class Gragh {
                         && (vertexsMap.get(vertexsList.get(i) + "---" + j) == null || (vertexsMap.get(vertexsList.get(i) + "---" + j) != weight))
                         && (vertexsMap.get(j + "---" + vertexsList.get(i)) == null || vertexsMap.get(j + "---" + vertexsList.get(i)) != weight)) {
                     boolean temp = false;
-                    //这里要进行避免环
+                    //这里要进行避免环，进行遍历存储节点的数组，如果有这个节点了，证明已经遍历过了
                     for (int k = 0; k < vertexsList.size(); k++) {
                         if (j == vertexsList.get(k)) {
                             temp = true;
@@ -180,8 +182,10 @@ public class Gragh {
         }
         if (curIndex >= 0 && vertexsList.get(curIndex) >= 0 && minWeight < MAX_WEIGHT) {
             primWeightNum += minWeight;
+            //进行记录已经遍历的弧
             vertexsMap.put(vertexsList.get(curIndex) + "---" + curIndex2, minWeight);
             vertexsMap.put(curIndex2 + "---" + vertexsList.get(curIndex), minWeight);
+            //进行记录已经遍历过的点
             vertexsList.add(curIndex2);
             Log.e("TAG", "prim遍历节点：" + curIndex2 + "   权值：" + primWeightNum);
             primOriginal();
